@@ -1,0 +1,77 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id "io.sentry.jvm.gradle" version "5.8.1"
+}
+
+group = 'com.tasktracker'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+
+	// platform
+	implementation 'org.springframework.boot:spring-boot-starter'
+
+	// web
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// migration-tool
+	implementation 'org.liquibase:liquibase-core'
+
+	// db-client
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'org.postgresql:postgresql'
+
+	//spring-kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+
+
+	// mapping-tool
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+
+
+	// docker
+//	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+	//JWT
+	implementation("io.jsonwebtoken:jjwt:0.9.1")
+
+	// lombok-tool
+	annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+
+	// validation-tool
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+sentry {
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
+
+	org = "tasktrackerby"
+	projectName = "java-spring-boot"
+	authToken = System.getenv("sntrys_eyJpYXQiOjE3NTQ5MjY1NTEuOTE5NjI0LCJ1cmwiOiJodHRwczovL3NlbnRyeS5pbyIsInJlZ2lvbl91cmwiOiJodHRwczovL2RlLnNlbnRyeS5pbyIsIm9yZyI6InRhc2t0cmFja2VyYnkifQ")
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

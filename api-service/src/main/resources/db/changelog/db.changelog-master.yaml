@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: egorivanov
+      runOnChange: true
+      changes:
+        - sqlFile:
+            path: db.changelog-1.1.sql
+            relativeToChangelogFile: true

@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: 'postgres:17'
+    container_name: postgres-db-taskTracker
+    restart: always
+    env_file:
+      - postgres.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./api-service/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - taskTracker
+  frontend:
+    build:
+      context: ./frontend-service
+    container_name: frontend_tasktracker
+    environment:
+      - API_URL=${API_URL}
+    networks:
+      - taskTracker
+
+  scheduler-service:
+    build:
+      context: ./scheduler-service
+      dockerfile: ../Dockerfile
+      args:
+        JAR_NAME: scheduler-service
+    container_name: scheduler_service_taskTracker
+    depends_on:
+      - kafka
+      - postgres
+    networks:
+      - taskTracker
+
+
+
+  email-service:
+    build:
+      context: ./email-service
+      dockerfile: ../Dockerfile
+      args:
+        JAR_NAME: email-service
+    container_name: email_service_taskTracker
+    depends_on:
+      - kafka
+    networks:
+      - taskTracker
+
+  api-service:
+    build:
+      context: ./api-service
+      dockerfile: ../Dockerfile
+      args:
+        JAR_NAME: api-service
+    container_name: api_service_taskTracker
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - taskTracker
+
+
+  zookeeper:
+    image: 'confluentinc/cp-zookeeper:7.6.1'
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
+      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
+    networks:
+      - taskTracker
+
+  kafka:
+    image: 'confluentinc/cp-kafka:7.6.1'
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
+      KAFKA_LISTENERS: ${KAFKA_LISTENERS}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+    networks:
+      - taskTracker
+volumes:
+  kafka-data:
+  postgres_data:
+
+
+networks:
+  taskTracker:
