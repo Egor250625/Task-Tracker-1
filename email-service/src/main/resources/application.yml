@@ -1,0 +1,36 @@
+
+server:
+  port: ${secrets.server.port}
+spring:
+  kafka:
+    bootstrap-servers: ${secrets.kafka.bootstrap-servers}
+    consumer:
+      group-id: ${secrets.kafka.consumer.group-id}
+      task-group-id: ${secrets.kafka.consumer.task-group-id}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+  mail:
+    host: ${secrets.mail.host}
+    port: ${secrets.mail.port}
+    username: ${secrets.mail.username}
+    password: ${secrets.mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  config:
+    import: classpath:application-secrets.yml
+
+task-tracker:
+  mail:
+    from: ${secrets.mail.username}
+
+kafka:
+  topics:
+    email-sending: ${secrets.kafka.topics.email-sending}
+    task-notification: ${secrets.kafka.topics.task-notification}

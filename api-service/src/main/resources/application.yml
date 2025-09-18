@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=task_tracker
+    username: ${secrets.postgres.username}
+    password: ${secrets.postgres.password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+  kafka:
+    bootstrap-servers: ${secrets.kafka.bootstrap-servers}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+        hbm2ddl.auto: validate
+        check-schema: validate_strict
+        default-schema: task_tracker
+    open-in-view: false
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    default-schema: task_tracker
+  docker:
+    compose:
+      enabled: true
+  config:
+    import: classpath:application-secrets.yml
+
+jwt:
+  secret: ${secrets.jwt.secret}
+  lifetime: 30m
+
+kafka:
+  topics:
+    email-sending: ${secrets.kafka.topics.email-sending}
+    user-info: ${secrets.kafka.topics.user-info}
+    task-notification: ${secrets.kafka.topics.task-notification}
+server:
+  port: ${secrets.server.port}

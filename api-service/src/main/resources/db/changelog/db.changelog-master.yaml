@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-user-table
+      author: egorivanov
+      changes:
+        - sqlFile:
+            path: db.changelog-1.1.sql
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: create-user-events-table
+      author: egorivanov
+      changes:
+        - sqlFile:
+            path: db.changelog-1.2.sql
+            relativeToChangelogFile: true
